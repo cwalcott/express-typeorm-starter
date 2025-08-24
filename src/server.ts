@@ -26,8 +26,8 @@ async function startServer() {
       message: 'Flexible Database API',
       endpoints: {
         users: '/api/users',
-        health: '/health',
-      },
+        health: '/health'
+      }
     });
   });
 
@@ -40,13 +40,13 @@ async function startServer() {
         status: 'ok',
         database: isConnected ? 'connected' : 'disconnected',
         environment: process.env.NODE_ENV || 'development',
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toISOString()
       });
     } catch (error) {
       res.status(500).json({
         status: 'error',
         database: 'error',
-        error: (error as Error).message,
+        error: (error as Error).message
       });
     }
   });

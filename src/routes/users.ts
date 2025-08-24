@@ -10,7 +10,7 @@ router.get('/', async (req: Request, res: Response) => {
     const dataSource = await getDataSource();
     const userRepo = dataSource.getRepository(User);
     const users = await userRepo.find({
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'DESC' }
     });
     res.json(users);
   } catch {
@@ -24,7 +24,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     const dataSource = await getDataSource();
     const userRepo = dataSource.getRepository(User);
     const user = await userRepo.findOne({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id) }
     });
 
     if (!user) {

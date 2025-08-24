@@ -10,7 +10,7 @@ export async function createDataSource(config?: DatabaseConfig): Promise<DataSou
     entities: [User],
     migrations: ['src/migrations/*.ts'],
     synchronize: process.env.NODE_ENV !== 'production',
-    logging: process.env.NODE_ENV === 'development' ? (['error', 'warn'] as LogLevel[]) : false,
+    logging: process.env.NODE_ENV === 'development' ? (['error', 'warn'] as LogLevel[]) : false
   };
 
   let dataSource: DataSource;
@@ -20,7 +20,7 @@ export async function createDataSource(config?: DatabaseConfig): Promise<DataSou
       dataSource = new DataSource({
         type: 'postgres',
         url: dbConfig.url,
-        ...baseConfig,
+        ...baseConfig
       });
       break;
 
@@ -28,7 +28,7 @@ export async function createDataSource(config?: DatabaseConfig): Promise<DataSou
       dataSource = new DataSource({
         type: 'postgres',
         driver: new PGliteDriver().driver,
-        ...baseConfig,
+        ...baseConfig
       });
       break;
 
@@ -36,7 +36,7 @@ export async function createDataSource(config?: DatabaseConfig): Promise<DataSou
       dataSource = new DataSource({
         type: 'postgres',
         driver: new PGliteDriver({ dataDir: dbConfig.path }).driver,
-        ...baseConfig,
+        ...baseConfig
       });
       break;
 

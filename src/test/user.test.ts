@@ -20,7 +20,7 @@ describe('User Entity', () => {
     const user = userRepo.create({
       name: 'Test User',
       email: 'test@example.com',
-      age: 28,
+      age: 28
     });
 
     const savedUser = await userRepo.save(user);
@@ -49,12 +49,12 @@ describe('User Entity', () => {
 
     const user1 = userRepo.create({
       name: 'User 1',
-      email: 'duplicate@example.com',
+      email: 'duplicate@example.com'
     });
 
     const user2 = userRepo.create({
       name: 'User 2',
-      email: 'duplicate@example.com',
+      email: 'duplicate@example.com'
     });
 
     await userRepo.save(user1);
@@ -68,7 +68,7 @@ describe('User Entity', () => {
 
     const user = userRepo.create({
       name: 'Update Test',
-      email: 'update@example.com',
+      email: 'update@example.com'
     });
 
     const savedUser = await userRepo.save(user);

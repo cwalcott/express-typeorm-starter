@@ -14,7 +14,7 @@ export function getDatabaseConfig(): DatabaseConfig {
   if (env === 'test') {
     return {
       type: 'pglite-memory',
-      shouldLoadFixtures: true,
+      shouldLoadFixtures: true
     };
   }
 
@@ -23,7 +23,7 @@ export function getDatabaseConfig(): DatabaseConfig {
     return {
       type: 'postgres',
       url: process.env.DATABASE_URL || 'postgresql://localhost:5432/myapp_dev',
-      shouldLoadFixtures: forceFixtures,
+      shouldLoadFixtures: forceFixtures
     };
   }
 
@@ -31,13 +31,13 @@ export function getDatabaseConfig(): DatabaseConfig {
   if (env === 'development') {
     return {
       type: 'pglite-file',
-      path: './data/dev.db',
+      path: './data/dev.db'
     };
   }
 
   // Production - always full postgres
   return {
     type: 'postgres',
-    url: process.env.DATABASE_URL!,
+    url: process.env.DATABASE_URL!
   };
 }
