@@ -71,6 +71,12 @@ async function startServer() {
     console.log(`🌐 Server running on http://localhost:${port}`);
     console.log(`📊 Health check: http://localhost:${port}/health`);
     console.log(`👥 Users API: http://localhost:${port}/api/users`);
+    console.log('🔄 Server is now listening for connections');
+  });
+
+  server.on('error', (error) => {
+    console.error('❌ Server error:', error);
+    process.exit(1);
   });
 
   // Graceful shutdown
@@ -92,9 +98,7 @@ async function startServer() {
 }
 
 // Start the server
-if (require.main === module) {
-  startServer().catch((error) => {
-    console.error('❌ Failed to start server:', error);
-    process.exit(1);
-  });
-}
+startServer().catch((error) => {
+  console.error('❌ Failed to start server:', error);
+  process.exit(1);
+});
