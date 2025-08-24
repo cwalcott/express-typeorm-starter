@@ -50,14 +50,10 @@
     "typescript-eslint": "^8.40.0",
     "vitest": "^3.2.4"
   },
-  "keywords": [
-    "nodejs",
-    "typescript",
-    "express",
-    "typeorm",
-    "pglite",
-    "postgresql"
-  ],
-  "author": "",
-  "license": "MIT"
+  "author": "Costa Walcott",
+  "license": "MIT",
+  "engines": {
+    "node": "^22.18.0 || ^24.0.0",
+    "npm": ">= 10"
+  }
 }
