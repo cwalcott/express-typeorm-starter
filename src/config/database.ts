@@ -1,43 +1,43 @@
 export interface DatabaseConfig {
-  type: 'postgres' | 'pglite-memory' | 'pglite-file'
-  url?: string
-  path?: string
-  shouldLoadFixtures?: boolean
+  type: 'postgres' | 'pglite-memory' | 'pglite-file';
+  url?: string;
+  path?: string;
+  shouldLoadFixtures?: boolean;
 }
 
 export function getDatabaseConfig(): DatabaseConfig {
-  const env = process.env.NODE_ENV || 'development'
-  const dbType = process.env.DATABASE_TYPE
-  const forceFixtures = process.env.FORCE_FIXTURES === 'true'
-  
+  const env = process.env.NODE_ENV || 'development';
+  const dbType = process.env.DATABASE_TYPE;
+  const forceFixtures = process.env.FORCE_FIXTURES === 'true';
+
   // Test environment - always in-memory for isolation
   if (env === 'test') {
-    return { 
+    return {
       type: 'pglite-memory',
-      shouldLoadFixtures: true
-    }
+      shouldLoadFixtures: true,
+    };
   }
-  
+
   // Explicit override for full postgres in dev
   if (dbType === 'postgres') {
-    return { 
+    return {
       type: 'postgres',
       url: process.env.DATABASE_URL || 'postgresql://localhost:5432/myapp_dev',
-      shouldLoadFixtures: forceFixtures
-    }
+      shouldLoadFixtures: forceFixtures,
+    };
   }
-  
+
   // Development default - file-based PGlite with fixtures
   if (env === 'development') {
-    return { 
+    return {
       type: 'pglite-file',
-      path: './data/dev.db'
-    }
+      path: './data/dev.db',
+    };
   }
-  
+
   // Production - always full postgres
-  return { 
+  return {
     type: 'postgres',
-    url: process.env.DATABASE_URL!
-  }
+    url: process.env.DATABASE_URL!,
+  };
 }

@@ -1,22 +1,28 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm'
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id!: number
+  id!: number;
 
   @Column('varchar', { length: 100 })
-  name!: string
+  name!: string;
 
   @Column('varchar', { unique: true, length: 255 })
-  email!: string
+  email!: string;
 
   @Column('integer', { nullable: true })
-  age?: number
+  age?: number;
 
   @CreateDateColumn()
-  createdAt!: Date
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt!: Date
+  updatedAt!: Date;
 }
