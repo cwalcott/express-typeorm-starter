@@ -20,6 +20,9 @@ A modern Node.js REST API starter with a flexible database setup that supports b
 # Install dependencies
 npm install
 
+# Run all validation checks (recommended first step)
+npm run ci
+
 # Start development server (uses file-based PGlite)
 npm run dev
 
@@ -101,14 +104,25 @@ PORT=3000
 - `GET /` - API information
 - `GET /health` - Health check with database status
 
-## 🧪 Testing
+## 🧪 Testing & Validation
 
 ```bash
-# Run all tests
+# Run complete validation suite (TypeScript, linting, formatting, tests)
+npm run ci
+
+# Run all tests once
 npm test
 
-# Run tests in watch mode
+# Run tests in watch mode (development)
 npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+
+# Individual validation steps
+npm run typecheck     # TypeScript compilation check
+npm run lint         # Code quality check
+npm run format:check # Code formatting check
 ```
 
 ## 🏗️ Development Workflow
@@ -194,11 +208,27 @@ npm start
 
 ### Quick Commands Reference
 ```bash
+# Development
 npm run dev           # Standard development
 npm run dev:fresh     # Reset database
 npm run dev:postgres  # Use real PostgreSQL
-npm test             # Run test suite
-npm run build        # Build for production
+
+# Validation & Testing
+npm run ci           # Run all checks (recommended)
+npm test            # Run test suite
+npm run test:watch  # Tests in watch mode
+
+# Production
+npm run build       # Build for production
+npm start          # Start production server
+
+# Database Management  
+npm run db:reset    # Reset database completely
+npm run db:seed     # Load fixtures into existing DB
+
+# Utilities
+npm run clean       # Remove build artifacts
+npm run reset       # Clean reinstall
 ```
 
 ### Debugging Database Issues

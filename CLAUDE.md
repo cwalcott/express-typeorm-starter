@@ -4,24 +4,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
+### Validation & Quality Assurance
+- `npm run ci` - **Primary validation command** - runs typecheck, lint, format:check, and tests
+- `npm run typecheck` - TypeScript compilation check without emitting files
+- `npm test` - Run test suite once with Vitest (uses in-memory PGlite)
+- `npm run test:watch` - Run tests in watch mode (development)
+- `npm run test:coverage` - Run tests with coverage reporting
+- `npm run lint` - Check code quality with ESLint
+- `npm run lint:fix` - Fix ESLint issues automatically
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check if code is properly formatted
+
 ### Core Development
 - `npm run dev` - Start development server with file-based PGlite database
 - `npm run dev:fresh` - Start with fresh database and fixtures (removes ./data)
 - `npm run dev:postgres` - Use full PostgreSQL instead of PGlite
 - `npm run dev:postgres:fresh` - PostgreSQL with forced fixture reload
 
-### Testing
-- `npm test` - Run test suite with Vitest (uses in-memory PGlite)
-- `npm run test:watch` - Run tests in watch mode
-
 ### Build and Production
 - `npm run build` - TypeScript compilation to ./dist
+- `npm run build:prod` - Production build with NODE_ENV=production
 - `npm start` - Start production server (requires build first)
+- `npm run start:prod` - Start production server with NODE_ENV=production
 
 ### Database Management
+- `npm run db:reset` - Reset database completely (removes ./data and starts fresh)
+- `npm run db:seed` - Load fixtures into existing database
 - `npm run migration:generate` - Generate TypeORM migration
 - `npm run migration:run` - Run pending migrations
 - `npm run migration:revert` - Revert last migration
+
+### Utilities
+- `npm run clean` - Remove build artifacts and cache files
+- `npm run reset` - Complete reset (removes node_modules and reinstalls)
 
 ## Architecture Overview
 
