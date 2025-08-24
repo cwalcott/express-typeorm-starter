@@ -60,7 +60,7 @@ async function startServer() {
   });
 
   app.use(
-    (error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    (error: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
       console.error('Unhandled error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }

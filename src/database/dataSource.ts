@@ -41,7 +41,7 @@ export async function createDataSource(config?: DatabaseConfig): Promise<DataSou
       break;
 
     default:
-      throw new Error(`Unsupported database type: ${(dbConfig as any).type}`);
+      throw new Error(`Unsupported database type: ${(dbConfig as { type: string }).type}`);
   }
 
   return dataSource;

@@ -13,7 +13,7 @@ router.get('/', async (req: Request, res: Response) => {
       order: { createdAt: 'DESC' },
     });
     res.json(users);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
@@ -32,7 +32,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     }
 
     res.json(user);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch user' });
   }
 });
@@ -54,7 +54,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     res.status(201).json(savedUser);
   } catch (error) {
-    if ((error as any).code === '23505') {
+    if ((error as { code?: string }).code === '23505') {
       // Unique constraint violation
       res.status(400).json({ error: 'Email already exists' });
     } else {
@@ -84,7 +84,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     const updatedUser = await userRepo.save(user);
     res.json(updatedUser);
   } catch (error) {
-    if ((error as any).code === '23505') {
+    if ((error as { code?: string }).code === '23505') {
       res.status(400).json({ error: 'Email already exists' });
     } else {
       res.status(500).json({ error: 'Failed to update user' });
@@ -107,7 +107,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     }
 
     res.status(204).send();
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Failed to delete user' });
   }
 });
