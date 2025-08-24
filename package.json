@@ -12,7 +12,7 @@
     "build:prod": "NODE_ENV=production tsc",
     "start": "node dist/server.js",
     "start:prod": "NODE_ENV=production node dist/server.js",
-    "test": "NODE_ENV=test vitest run",
+    "test": "NODE_ENV=test vitest run --reporter=dot --silent",
     "test:watch": "NODE_ENV=test vitest",
     "test:coverage": "NODE_ENV=test vitest run --coverage",
     "typecheck": "tsc --noEmit",
