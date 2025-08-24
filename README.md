@@ -1,6 +1,6 @@
-# Flexible Database REST API
+# Express TypeORM Starter
 
-A modern Node.js REST API with a flexible database setup that supports both PGlite (embedded PostgreSQL) and full PostgreSQL, designed for optimal developer experience across different environments.
+A modern Node.js REST API starter with a flexible database setup that supports both PGlite (embedded PostgreSQL) and full PostgreSQL, designed for optimal developer experience across different environments.
 
 ## 🌟 Features
 

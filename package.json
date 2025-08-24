@@ -1,5 +1,5 @@
 {
-  "name": "flexible-db-api",
+  "name": "express-typeorm-starter",
   "version": "1.0.0",
   "description": "REST API with flexible PGlite/PostgreSQL database setup",
   "main": "dist/server.js",
