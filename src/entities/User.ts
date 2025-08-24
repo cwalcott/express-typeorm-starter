@@ -5,13 +5,13 @@ export class User {
   @PrimaryGeneratedColumn()
   id!: number
 
-  @Column({ length: 100 })
+  @Column('varchar', { length: 100 })
   name!: string
 
-  @Column({ unique: true, length: 255 })
+  @Column('varchar', { unique: true, length: 255 })
   email!: string
 
-  @Column({ nullable: true })
+  @Column('integer', { nullable: true })
   age?: number
 
   @CreateDateColumn()
