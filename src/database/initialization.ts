@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
-import { existsSync, mkdirSync } from 'fs';
-import { dirname } from 'path';
+import { existsSync, mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { DatabaseConfig } from '../config/database';
 import { loadFixtures } from './fixtures';
 

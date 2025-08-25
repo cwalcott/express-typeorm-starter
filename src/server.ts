@@ -21,7 +21,7 @@ async function startServer() {
   }
 
   // Routes
-  app.get('/', (req, res) => {
+  app.get('/', (_, res) => {
     res.json({
       message: 'Flexible Database API',
       endpoints: {
@@ -31,7 +31,7 @@ async function startServer() {
     });
   });
 
-  app.get('/health', async (req, res) => {
+  app.get('/health', async (_, res) => {
     try {
       const dataSource = await getDataSource();
       const isConnected = dataSource.isInitialized;
@@ -55,12 +55,12 @@ async function startServer() {
   app.use('/api/users', usersRouter);
 
   // Error handling
-  app.use((req, res) => {
+  app.use((_, res) => {
     res.status(404).json({ error: 'Endpoint not found' });
   });
 
   app.use(
-    (error: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    (error: Error, _: express.Request, res: express.Response, _next: express.NextFunction) => {
       console.error('Unhandled error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
