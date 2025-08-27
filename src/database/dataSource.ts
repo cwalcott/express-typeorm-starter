@@ -1,5 +1,7 @@
 import { DataSource, LogLevel } from 'typeorm';
 import { PGliteDriver } from 'typeorm-pglite';
+import { mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { DatabaseConfig, getDatabaseConfig } from '../config/database.js';
 import { User } from '../entities/User.js';
 
@@ -33,6 +35,8 @@ export async function createDataSource(config?: DatabaseConfig): Promise<DataSou
       break;
 
     case 'pglite-file':
+      // Ensure directory exists before creating PGliteDriver
+      mkdirSync(dirname(dbConfig.path!), { recursive: true });
       dataSource = new DataSource({
         type: 'postgres',
         driver: new PGliteDriver({ dataDir: dbConfig.path }).driver,
