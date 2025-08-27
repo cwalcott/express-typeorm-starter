@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
-import { createDataSource } from './dataSource';
-import { initializeDatabase } from './initialization';
-import { getDatabaseConfig } from '../config/database';
+import { createDataSource } from './dataSource.js';
+import { initializeDatabase } from './initialization.js';
+import { getDatabaseConfig } from '../config/database.js';
 
 let dataSource: DataSource | null = null;
 
@@ -24,5 +24,5 @@ export async function closeDatabase(): Promise<void> {
 }
 
 // Export for testing
-export { createDataSource } from './dataSource';
-export { loadFixtures } from './fixtures';
+export { createDataSource } from './dataSource.js';
+export { loadFixtures } from './fixtures.js';

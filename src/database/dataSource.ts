@@ -1,7 +1,7 @@
 import { DataSource, LogLevel } from 'typeorm';
 import { PGliteDriver } from 'typeorm-pglite';
-import { DatabaseConfig, getDatabaseConfig } from '../config/database';
-import { User } from '../entities/User';
+import { DatabaseConfig, getDatabaseConfig } from '../config/database.js';
+import { User } from '../entities/User.js';
 
 export async function createDataSource(config?: DatabaseConfig): Promise<DataSource> {
   const dbConfig = config || getDatabaseConfig();

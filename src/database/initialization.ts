@@ -1,8 +1,8 @@
 import { DataSource } from 'typeorm';
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { DatabaseConfig } from '../config/database';
-import { loadFixtures } from './fixtures';
+import { DatabaseConfig } from '../config/database.js';
+import { loadFixtures } from './fixtures.js';
 
 export async function initializeDatabase(
   dataSource: DataSource,

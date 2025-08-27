@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { createDataSource, loadFixtures } from '../database';
+import { createDataSource, loadFixtures } from '../database/index.js';
 
 export async function setupTestDB(): Promise<DataSource> {
   const dataSource = await createDataSource({ type: 'pglite-memory' });

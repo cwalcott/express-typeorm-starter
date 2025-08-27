@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { getDataSource } from '../database';
-import { User } from '../entities/User';
+import { getDataSource } from '../database/index.js';
+import { User } from '../entities/User.js';
 
 const router = Router();
 

@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import express from 'express';
-import { getDataSource, closeDatabase } from './database';
-import { usersRouter } from './routes/users';
+import { getDataSource, closeDatabase } from './database/index.js';
+import { usersRouter } from './routes/users.js';
 
 async function startServer() {
   const app = express();

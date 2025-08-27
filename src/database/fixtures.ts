@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { User } from '../entities/User';
+import { User } from '../entities/User.js';
 
 export async function loadFixtures(dataSource: DataSource): Promise<void> {
   if (process.env.NODE_ENV === 'production') {
