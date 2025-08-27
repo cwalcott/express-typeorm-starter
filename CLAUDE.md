@@ -5,10 +5,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ### Validation & Quality Assurance
-- `npm run ci` - **Primary validation command** - runs typecheck, lint, format:check, and tests
+- `npm run ci` - **Primary validation command** - runs typecheck, lint, format:check, unit tests, and integration tests
 - `npm run typecheck` - TypeScript compilation check without emitting files
-- `npm test` - Run test suite once with Vitest (uses in-memory PGlite)
-- `npm run test:watch` - Run tests in watch mode (development)
+- `npm test` - Run all tests (both unit and integration)
+- `npm run test:unit` - Run unit tests only (fast, pure business logic)
+- `npm run test:integration` - Run integration tests only (slower, full stack with database)
+- `npm run test:watch` - Run all tests in watch mode (development)
+- `npm run test:watch:unit` - Run unit tests in watch mode
+- `npm run test:watch:integration` - Run integration tests in watch mode
 - `npm run test:coverage` - Run tests with coverage reporting
 - `npm run lint` - Check code quality with ESLint
 - `npm run lint:fix` - Fix ESLint issues automatically
@@ -94,10 +98,24 @@ The core innovation is in `src/config/database.ts` which provides environment-aw
 - PGlite uses the typeorm-pglite adapter for compatibility
 
 ### Testing Strategy
-Tests use isolated in-memory databases with automatic fixture loading via the test setup in `src/test/setup.ts`. Each test gets a fresh database instance.
+The project uses a clear separation between unit and integration tests:
+
+**Unit Tests** (`src/test/unit/`):
+- Fast execution (no external dependencies)
+- Test pure business logic in isolation
+- Use `npm run test:unit` for quick feedback during development
+
+**Integration Tests** (`src/test/integration/`):
+- Test full HTTP → Route → Database stack
+- Use isolated in-memory PGlite databases with automatic fixture loading
+- Each test gets a fresh database instance via `src/test/integration/setup.ts`
+- Use `npm run test:integration` for end-to-end validation
 
 ### File Structure Key Points
 - `src/entities/` - TypeORM entity definitions
 - `src/routes/` - Express route handlers  
+- `src/services/` - Business logic and pure functions
+- `src/test/unit/` - Unit tests for business logic
+- `src/test/integration/` - Integration tests for full stack functionality
 - `./data/` - PGlite database files (gitignored)
 - Routes follow REST conventions under `/api/` prefix

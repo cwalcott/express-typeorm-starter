@@ -13,7 +13,11 @@
     "start": "node dist/server.js",
     "start:prod": "NODE_ENV=production node dist/server.js",
     "test": "NODE_ENV=test vitest run --reporter=dot --silent",
+    "test:unit": "NODE_ENV=test vitest run src/test/unit --reporter=dot --silent",
+    "test:integration": "NODE_ENV=test vitest run src/test/integration --reporter=dot --silent",
     "test:watch": "NODE_ENV=test vitest",
+    "test:watch:unit": "NODE_ENV=test vitest src/test/unit",
+    "test:watch:integration": "NODE_ENV=test vitest src/test/integration",
     "test:coverage": "NODE_ENV=test vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "migration:generate": "typeorm-ts-node-commonjs migration:generate",
@@ -27,7 +31,7 @@
     "format:check": "prettier --check src/",
     "clean": "rm -rf dist node_modules/.cache .nyc_output coverage",
     "reset": "rm -rf node_modules package-lock.json && npm install",
-    "ci": "npm run typecheck && npm run lint && npm run format:check && npm run test"
+    "ci": "npm run typecheck && npm run lint && npm run format:check && npm run test:unit && npm run test:integration"
   },
   "type": "module",
   "dependencies": {

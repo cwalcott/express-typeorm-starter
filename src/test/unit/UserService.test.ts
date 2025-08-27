@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { UserService } from '../services/UserService.js';
+import { UserService } from '../../services/UserService.js';
 
 describe('UserService', () => {
   describe('validateEmail', () => {

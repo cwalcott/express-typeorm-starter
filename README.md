@@ -51,9 +51,14 @@ src/
 │   └── User.ts              # TypeORM entities
 ├── routes/
 │   └── users.ts             # API route handlers
+├── services/
+│   └── UserService.ts       # Business logic and pure functions
 ├── test/
-│   ├── setup.ts             # Test database setup
-│   └── user.test.ts         # Example tests
+│   ├── unit/                # Unit tests (business logic)
+│   │   └── UserService.test.ts
+│   └── integration/         # Integration tests (full stack)
+│       ├── setup.ts         # Test database setup
+│       └── user.test.ts     # API endpoint tests
 └── server.ts                # Express server setup
 ```
 
@@ -106,24 +111,32 @@ PORT=3000
 
 ## 🧪 Testing & Validation
 
+The project uses a clear separation between unit and integration tests:
+
 ```bash
 # Run complete validation suite (TypeScript, linting, formatting, tests)
 npm run ci
 
-# Run all tests once
-npm test
+# Unit tests (fast, pure business logic)
+npm run test:unit              # Run unit tests once
+npm run test:watch:unit        # Unit tests in watch mode
 
-# Run tests in watch mode (development)
-npm run test:watch
+# Integration tests (slower, full stack with database)
+npm run test:integration       # Run integration tests once
+npm run test:watch:integration # Integration tests in watch mode
 
-# Run tests with coverage
-npm run test:coverage
+# All tests
+npm test              # Run all tests (unit + integration)
+npm run test:watch    # All tests in watch mode
+npm run test:coverage # All tests with coverage
 
 # Individual validation steps
 npm run typecheck     # TypeScript compilation check
 npm run lint         # Code quality check
 npm run format:check # Code formatting check
 ```
+
+**Unit Tests** (`src/test/unit/`) test business logic without external dependencies. **Integration Tests** (`src/test/integration/`) test the full HTTP → Route → Database stack using in-memory PGlite.
 
 ## 🏗️ Development Workflow
 
@@ -214,9 +227,13 @@ npm run dev:fresh     # Reset database
 npm run dev:postgres  # Use real PostgreSQL
 
 # Validation & Testing
-npm run ci           # Run all checks (recommended)
-npm test            # Run test suite
-npm run test:watch  # Tests in watch mode
+npm run ci                     # Run all checks (recommended)
+npm test                      # Run all tests (unit + integration)
+npm run test:unit             # Run unit tests only (fast)
+npm run test:integration      # Run integration tests only
+npm run test:watch            # All tests in watch mode
+npm run test:watch:unit       # Unit tests in watch mode
+npm run test:watch:integration # Integration tests in watch mode
 
 # Production
 npm run build       # Build for production
