@@ -38,6 +38,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run clean` - Remove build artifacts and cache files
 - `npm run reset` - Complete reset (removes node_modules and reinstalls)
 
+## Development Workflow
+
+**IMPORTANT**: Always run `npm run ci` after making code changes. This ensures:
+- TypeScript compilation passes (`typecheck`)
+- Code quality standards are met (`lint`)
+- Code formatting is consistent (`format:check`) 
+- All tests pass (`test`)
+
+If `npm run ci` fails, fix the issues immediately. This catches problems early rather than discovering them at commit time.
+
 ## Architecture Overview
 
 This is a flexible REST API that supports three database modes through a unified configuration system:
