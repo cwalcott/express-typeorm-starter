@@ -3,6 +3,7 @@ import { existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DatabaseConfig } from '../config/database.js';
 import { loadFixtures } from './fixtures.js';
+import { User } from '../entities/User.js';
 
 export async function initializeDatabase(
   dataSource: DataSource,
@@ -27,11 +28,18 @@ export async function initializeDatabase(
 }
 
 async function handleFileBasedDatabase(dataSource: DataSource, dbPath: string): Promise<void> {
-  const dbExists = existsSync(dbPath);
+  const dbDirExists = existsSync(dbPath);
 
-  if (!dbExists) {
-    // Ensure directory exists
-    mkdirSync(dirname(dbPath), { recursive: true });
+  // Check if database is empty by counting users
+  const userRepo = dataSource.getRepository(User);
+  const userCount = await userRepo.count();
+  const isEmpty = userCount === 0;
+
+  if (!dbDirExists || isEmpty) {
+    if (!dbDirExists) {
+      // Ensure directory exists
+      mkdirSync(dirname(dbPath), { recursive: true });
+    }
 
     console.log('🗃️  Creating new development database with fixtures...');
 
