@@ -98,25 +98,44 @@ The core innovation is in `src/config/database.ts` which provides environment-aw
 - PGlite uses the typeorm-pglite adapter for compatibility
 
 ### Testing Strategy
-The project uses a clear separation between unit and integration tests:
+The project uses a comprehensive three-layer testing approach:
 
 **Unit Tests** (`src/test/unit/`):
 - Fast execution (no external dependencies)
 - Test pure business logic in isolation
 - Use `npm run test:unit` for quick feedback during development
+- Example: Testing UserService validation functions
 
-**Integration Tests** (`src/test/integration/`):
-- Test full HTTP → Route → Database stack
+**Entity Integration Tests** (`src/test/integration/`):
+- Test database layer with TypeORM entities
 - Use isolated in-memory PGlite databases with automatic fixture loading
 - Each test gets a fresh database instance via `src/test/integration/setup.ts`
-- Use `npm run test:integration` for end-to-end validation
+- Example: Testing User entity CRUD operations, constraints
+
+**Route Integration Tests** (`src/test/integration/`):
+- Test complete HTTP → Route → Service → Database stack
+- Use supertest for real HTTP requests through Express app
+- Created via `src/test/integration/test-app.ts` factory
+- Test full request/response cycle with proper status codes, validation, error handling
+- Example: `POST /api/users` with input validation, database persistence, unique constraints
+- Use `npm run test:integration` for complete end-to-end validation
+
+**When adding new routes:**
+1. Create route handler in `src/routes/`
+2. Add corresponding integration tests in `src/test/integration/`
+3. Test all HTTP methods, status codes, error cases, and edge cases
+4. Use the existing `test-app.ts` factory for consistent Express app setup
 
 ### File Structure Key Points
 - `src/entities/` - TypeORM entity definitions
 - `src/routes/` - Express route handlers  
 - `src/services/` - Business logic and pure functions
 - `src/test/unit/` - Unit tests for business logic
-- `src/test/integration/` - Integration tests for full stack functionality
+- `src/test/integration/` - Entity and route integration tests
+  - `setup.ts` - Test database configuration
+  - `test-app.ts` - Express app factory for HTTP testing
+  - `*-routes.test.ts` - HTTP endpoint tests using supertest
+  - `*.test.ts` - Entity/database layer tests
 - `./data/` - PGlite database files (gitignored)
 - Routes follow REST conventions under `/api/` prefix
 

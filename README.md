@@ -44,21 +44,23 @@ src/
 │   └── database.ts          # Database configuration logic
 ├── database/
 │   ├── index.ts             # Database connection management
-│   ├── dataSource.ts        # TypeORM DataSource factory
+│   ├── data-source.ts       # TypeORM DataSource factory
 │   ├── initialization.ts    # Smart database initialization
 │   └── fixtures.ts          # Development fixtures
 ├── entities/
-│   └── User.ts              # TypeORM entities
+│   └── user.ts              # TypeORM entities
 ├── routes/
 │   └── users.ts             # API route handlers
 ├── services/
-│   └── UserService.ts       # Business logic and pure functions
+│   └── user-service.ts      # Business logic and pure functions
 ├── test/
 │   ├── unit/                # Unit tests (business logic)
-│   │   └── UserService.test.ts
+│   │   └── user-service.test.ts
 │   └── integration/         # Integration tests (full stack)
 │       ├── setup.ts         # Test database setup
-│       └── user.test.ts     # API endpoint tests
+│       ├── test-app.ts      # Express app factory for testing
+│       ├── user.test.ts     # Entity integration tests
+│       └── user-routes.test.ts # HTTP route integration tests
 └── server.ts                # Express server setup
 ```
 
@@ -136,7 +138,33 @@ npm run lint         # Code quality check
 npm run format:check # Code formatting check
 ```
 
-**Unit Tests** (`src/test/unit/`) test business logic without external dependencies. **Integration Tests** (`src/test/integration/`) test the full HTTP → Route → Database stack using in-memory PGlite.
+### Testing Strategy
+
+This project uses a comprehensive three-layer testing strategy:
+
+**🧪 Unit Tests** (`src/test/unit/`)
+- Test pure business logic in isolation
+- No external dependencies (database, HTTP)
+- Fast execution for quick feedback
+- Example: `UserService` validation functions
+
+**🔗 Entity Integration Tests** (`src/test/integration/`)
+- Test database layer with TypeORM entities
+- Use isolated in-memory PGlite databases
+- Test data persistence, constraints, relationships
+- Example: User entity CRUD operations
+
+**🌐 Route Integration Tests** (`src/test/integration/`)
+- Test complete HTTP → Route → Service → Database flow
+- Use supertest for real HTTP requests
+- Test full request/response cycle with proper status codes
+- Example: `POST /api/users` with validation, persistence, and error handling
+
+**Benefits:**
+- **Fast feedback**: Unit tests run in milliseconds
+- **Isolated testing**: Each layer tested independently
+- **Full coverage**: From business logic to HTTP endpoints
+- **Reliable CI/CD**: Catches issues at every level
 
 ## 🏗️ Development Workflow
 

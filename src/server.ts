@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import express from 'express';
 import { getDataSource, closeDatabase } from './database/index.js';
 import { usersRouter } from './routes/users.js';
+import { healthRouter } from './routes/health.js';
 
 async function startServer() {
   const app = express();
@@ -31,25 +32,8 @@ async function startServer() {
     });
   });
 
-  app.get('/health', async (_, res) => {
-    try {
-      const dataSource = await getDataSource();
-      const isConnected = dataSource.isInitialized;
-
-      res.json({
-        status: 'ok',
-        database: isConnected ? 'connected' : 'disconnected',
-        environment: process.env.NODE_ENV || 'development',
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        database: 'error',
-        error: (error as Error).message
-      });
-    }
-  });
+  // Health check endpoint
+  app.use(healthRouter);
 
   // API routes
   app.use('/api/users', usersRouter);
