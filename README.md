@@ -1,6 +1,6 @@
 # Express TypeORM Starter
 
-A modern Node.js REST API starter with a flexible database setup that supports both PGlite (embedded PostgreSQL) and full PostgreSQL, designed for optimal developer experience across different environments.
+A modern Node.js REST API starter app with a flexible database setup that supports both PGlite (embedded PostgreSQL) and full PostgreSQL, designed for optimal developer experience across different environments.
 
 ## 🌟 Features
 
@@ -40,28 +40,17 @@ npm test
 
 ```
 src/
-├── config/
-│   └── database.ts          # Database configuration logic
-├── database/
-│   ├── index.ts             # Database connection management
-│   ├── data-source.ts       # TypeORM DataSource factory
-│   ├── initialization.ts    # Smart database initialization
-│   └── fixtures.ts          # Development fixtures
-├── entities/
-│   └── user.ts              # TypeORM entities
-├── routes/
-│   └── users.ts             # API route handlers
-├── services/
-│   └── user-service.ts      # Business logic and pure functions
+├── config/              # Database configuration
+├── database/            # TypeORM setup and fixtures
+├── entities/            # Database entities
+├── routes/              # API route handlers  
+├── services/            # Business logic
 ├── test/
-│   ├── unit/                # Unit tests (business logic)
-│   │   └── user-service.test.ts
-│   └── integration/         # Integration tests (full stack)
-│       ├── setup.ts         # Test database setup
-│       ├── test-app.ts      # Express app factory for testing
-│       ├── user.test.ts     # Entity integration tests
-│       └── user-routes.test.ts # HTTP route integration tests
-└── server.ts                # Express server setup
+│   ├── unit/           # Unit tests (business logic)
+│   └── integration/    # Integration tests (database & routes)
+│       ├── database/   # Entity integration tests
+│       └── routes/     # HTTP route integration tests
+└── server.ts           # Express server entry point
 ```
 
 ## 🗄️ Database Modes
