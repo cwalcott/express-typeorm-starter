@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { DataSource } from 'typeorm';
 import { setupTestDB, cleanupTestDB } from './setup.js';
-import { User } from '../../entities/User.js';
+import { User } from '../../entities/user.js';
 
 describe('User Entity', () => {
   let dataSource: DataSource;

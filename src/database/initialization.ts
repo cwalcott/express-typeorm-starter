@@ -3,7 +3,7 @@ import { existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DatabaseConfig } from '../config/database.js';
 import { loadFixtures } from './fixtures.js';
-import { User } from '../entities/User.js';
+import { User } from '../entities/user.js';
 
 export async function initializeDatabase(
   dataSource: DataSource,

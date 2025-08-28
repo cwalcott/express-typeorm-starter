@@ -3,7 +3,7 @@ import { PGliteDriver } from 'typeorm-pglite';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DatabaseConfig, getDatabaseConfig } from '../config/database.js';
-import { User } from '../entities/User.js';
+import { User } from '../entities/user.js';
 
 export async function createDataSource(config?: DatabaseConfig): Promise<DataSource> {
   const dbConfig = config || getDatabaseConfig();

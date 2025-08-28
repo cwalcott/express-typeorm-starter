@@ -65,7 +65,7 @@ The core innovation is in `src/config/database.ts` which provides environment-aw
 ### Key Architecture Components
 
 **Database Layer** (`src/database/`):
-- `dataSource.ts` - Creates TypeORM DataSource with driver abstraction for PGlite/PostgreSQL
+- `data-source.ts` - Creates TypeORM DataSource with driver abstraction for PGlite/PostgreSQL
 - `initialization.ts` - Smart database setup logic that detects existing files and loads fixtures
 - `fixtures.ts` - Sample data management for development/testing
 
@@ -94,7 +94,7 @@ The core innovation is in `src/config/database.ts` which provides environment-aw
 ### TypeORM Configuration Notes
 - Development uses `synchronize: true` for rapid schema changes
 - Production should disable synchronization and use migrations
-- Entities are centrally registered in `dataSource.ts`
+- Entities are centrally registered in `data-source.ts`
 - PGlite uses the typeorm-pglite adapter for compatibility
 
 ### Testing Strategy
@@ -119,3 +119,20 @@ The project uses a clear separation between unit and integration tests:
 - `src/test/integration/` - Integration tests for full stack functionality
 - `./data/` - PGlite database files (gitignored)
 - Routes follow REST conventions under `/api/` prefix
+
+## File Naming Conventions
+
+This project follows **kebab-case** naming for all TypeScript files:
+
+- **Entities**: `user.ts` (matches class name `User`)
+- **Services**: `user-service.ts` 
+- **Routes**: `users.ts` (plural for REST endpoints)
+- **Tests**: `user-service.test.ts`, `user.test.ts`
+- **Utilities**: `data-source.ts`
+
+Examples:
+- ✅ `src/entities/user.ts`
+- ✅ `src/services/user-service.ts`
+- ✅ `src/test/unit/user-service.test.ts`
+- ❌ `src/entities/User.ts`
+- ❌ `src/services/UserService.ts`
