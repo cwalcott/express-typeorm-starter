@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import express from 'express';
+import helmet from 'helmet';
 import { getDataSource, closeDatabase } from './database/index.js';
 import { usersRouter } from './routes/users.js';
 import { healthRouter } from './routes/health.js';
@@ -7,6 +8,9 @@ import { healthRouter } from './routes/health.js';
 async function startServer() {
   const app = express();
   const port = process.env.PORT || 3000;
+
+  // Security middleware
+  app.use(helmet());
 
   // Middleware
   app.use(express.json());
