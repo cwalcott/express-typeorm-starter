@@ -104,6 +104,31 @@
 - [ ] Create services layer
 - [ ] Add constants/types directories
 
+## 🏗️ Architecture & Testing Strategy
+
+### Testing Strategy Refinement
+- [ ] Reorganize tests into clearer categories:
+  - **unit/**: Service layer tests (UserService CRUD + validation) - comprehensive edge cases
+  - **feature/**: HTTP workflow tests (routes) - happy path + key error cases  
+  - **integration/**: Component integration tests (database persistence, external APIs)
+- [ ] Rename `user.test.ts` to `user-persistence.test.ts` to clarify purpose
+- [ ] Add comprehensive UserService unit tests for:
+  - [ ] All CRUD operations with edge cases
+  - [ ] Email normalization and name sanitization
+  - [ ] Complex validation scenarios
+  - [ ] Database error handling
+- [ ] Simplify feature tests to focus on user journeys rather than exhaustive validation
+
+### Repository Pattern (Future Enhancement)  
+- [ ] Consider implementing custom UserRepository when needed for:
+  - [ ] Custom query methods (findByEmailDomain, findRecentlyActive)
+  - [ ] Complex query composition and reusable building blocks
+  - [ ] Database optimizations (query caching, batch operations) 
+  - [ ] Cross-cutting concerns (audit logging, soft deletes, row-level security)
+  - [ ] ORM abstraction layer for easier testing/swapping
+- [ ] Architecture would become: Service → Custom Repository → TypeORM Repository → Database
+- [ ] Update integration tests to test custom repository logic instead of basic TypeORM operations
+
 ### Documentation
 - [ ] Expand README with setup instructions
 - [ ] Add API documentation
