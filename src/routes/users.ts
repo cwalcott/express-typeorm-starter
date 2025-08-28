@@ -1,114 +1,65 @@
 import { Router, Request, Response } from 'express';
-import { getDataSource } from '../database/index.js';
-import { User } from '../entities/user.js';
+import { UserService } from '../services/user-service.js';
 
 const router = Router();
 
 // GET /users - List all users
 router.get('/', async (req: Request, res: Response) => {
-  try {
-    const dataSource = await getDataSource();
-    const userRepo = dataSource.getRepository(User);
-    const users = await userRepo.find({
-      order: { createdAt: 'DESC' }
-    });
-    res.json(users);
-  } catch {
-    res.status(500).json({ error: 'Failed to fetch users' });
+  const result = await UserService.getAllUsers();
+
+  if (result.success) {
+    res.json(result.data);
+  } else {
+    res.status(result.statusCode).json({ error: result.error });
   }
 });
 
 // GET /users/:id - Get user by ID
 router.get('/:id', async (req: Request, res: Response) => {
-  try {
-    const dataSource = await getDataSource();
-    const userRepo = dataSource.getRepository(User);
-    const user = await userRepo.findOne({
-      where: { id: parseInt(req.params.id) }
-    });
+  const id = parseInt(req.params.id);
+  const result = await UserService.getUserById(id);
 
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    res.json(user);
-  } catch {
-    res.status(500).json({ error: 'Failed to fetch user' });
+  if (result.success) {
+    res.json(result.data);
+  } else {
+    res.status(result.statusCode).json({ error: result.error });
   }
 });
 
 // POST /users - Create new user
 router.post('/', async (req: Request, res: Response) => {
-  try {
-    const { name, email, age } = req.body;
+  const { name, email, age } = req.body;
+  const result = await UserService.createUser({ name, email, age });
 
-    if (!name || !email) {
-      return res.status(400).json({ error: 'Name and email are required' });
-    }
-
-    const dataSource = await getDataSource();
-    const userRepo = dataSource.getRepository(User);
-
-    const user = userRepo.create({ name, email, age });
-    const savedUser = await userRepo.save(user);
-
-    res.status(201).json(savedUser);
-  } catch (error) {
-    if ((error as { code?: string }).code === '23505') {
-      // Unique constraint violation
-      res.status(400).json({ error: 'Email already exists' });
-    } else {
-      res.status(500).json({ error: 'Failed to create user' });
-    }
+  if (result.success) {
+    res.status(201).json(result.data);
+  } else {
+    res.status(result.statusCode).json({ error: result.error });
   }
 });
 
 // PUT /users/:id - Update user
 router.put('/:id', async (req: Request, res: Response) => {
-  try {
-    const { name, email, age } = req.body;
-    const userId = parseInt(req.params.id);
+  const id = parseInt(req.params.id);
+  const { name, email, age } = req.body;
+  const result = await UserService.updateUser(id, { name, email, age });
 
-    const dataSource = await getDataSource();
-    const userRepo = dataSource.getRepository(User);
-
-    const user = await userRepo.findOne({ where: { id: userId } });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    if (name !== undefined) user.name = name;
-    if (email !== undefined) user.email = email;
-    if (age !== undefined) user.age = age;
-
-    const updatedUser = await userRepo.save(user);
-    res.json(updatedUser);
-  } catch (error) {
-    if ((error as { code?: string }).code === '23505') {
-      res.status(400).json({ error: 'Email already exists' });
-    } else {
-      res.status(500).json({ error: 'Failed to update user' });
-    }
+  if (result.success) {
+    res.json(result.data);
+  } else {
+    res.status(result.statusCode).json({ error: result.error });
   }
 });
 
 // DELETE /users/:id - Delete user
 router.delete('/:id', async (req: Request, res: Response) => {
-  try {
-    const userId = parseInt(req.params.id);
+  const id = parseInt(req.params.id);
+  const result = await UserService.deleteUser(id);
 
-    const dataSource = await getDataSource();
-    const userRepo = dataSource.getRepository(User);
-
-    const result = await userRepo.delete(userId);
-
-    if (result.affected === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
+  if (result.success) {
     res.status(204).send();
-  } catch {
-    res.status(500).json({ error: 'Failed to delete user' });
+  } else {
+    res.status(result.statusCode).json({ error: result.error });
   }
 });
 

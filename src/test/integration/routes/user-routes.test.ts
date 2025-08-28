@@ -66,8 +66,10 @@ describe('User Routes Integration Tests', () => {
       expect(response.body.error).toBe('User not found');
     });
 
-    it('should return 500 for invalid user id', async () => {
-      await request(app).get('/api/users/invalid-id').expect(500);
+    it('should return 400 for invalid user id', async () => {
+      const response = await request(app).get('/api/users/invalid-id').expect(400);
+
+      expect(response.body.error).toBe('Invalid user ID');
     });
   });
 
@@ -110,7 +112,7 @@ describe('User Routes Integration Tests', () => {
 
       const response = await request(app).post('/api/users').send(invalidUser).expect(400);
 
-      expect(response.body.error).toBe('Name and email are required');
+      expect(response.body.error).toBe('Name is required');
     });
 
     it('should return 400 for missing email', async () => {
@@ -121,7 +123,7 @@ describe('User Routes Integration Tests', () => {
 
       const response = await request(app).post('/api/users').send(invalidUser).expect(400);
 
-      expect(response.body.error).toBe('Name and email are required');
+      expect(response.body.error).toBe('Email is required');
     });
 
     it('should return 400 for duplicate email', async () => {
@@ -134,6 +136,41 @@ describe('User Routes Integration Tests', () => {
       const response = await request(app).post('/api/users').send(duplicateUser).expect(400);
 
       expect(response.body.error).toBe('Email already exists');
+    });
+
+    it('should normalize email and sanitize name', async () => {
+      const newUser = {
+        name: 'john doe',
+        email: '  TEST@EXAMPLE.COM  '
+      };
+
+      const response = await request(app).post('/api/users').send(newUser).expect(201);
+
+      expect(response.body.name).toBe('John Doe');
+      expect(response.body.email).toBe('test@example.com');
+    });
+
+    it('should return 400 for invalid email format', async () => {
+      const invalidUser = {
+        name: 'Test User',
+        email: 'invalid-email-format'
+      };
+
+      const response = await request(app).post('/api/users').send(invalidUser).expect(400);
+
+      expect(response.body.error).toBe('Invalid email format');
+    });
+
+    it('should return 400 for invalid age', async () => {
+      const invalidUser = {
+        name: 'Test User',
+        email: 'test@example.com',
+        age: 200
+      };
+
+      const response = await request(app).post('/api/users').send(invalidUser).expect(400);
+
+      expect(response.body.error).toBe('Age must be between 0 and 150');
     });
   });
 
@@ -219,12 +256,9 @@ describe('User Routes Integration Tests', () => {
     });
 
     it('should return 404 for non-existent user', async () => {
-      // Use a very high ID that definitely doesn't exist
-      const response = await request(app).delete('/api/users/999999');
+      const response = await request(app).delete('/api/users/999999').expect(404);
 
-      // For now, accept that the delete operation might return 204 even for non-existent users
-      // This might be specific to PGlite behavior or our test setup
-      expect([204, 404]).toContain(response.status);
+      expect(response.body.error).toBe('User not found');
     });
   });
 

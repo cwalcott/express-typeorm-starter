@@ -141,5 +141,26 @@ describe('UserService', () => {
       expect(result.errors).toContain('Age must be between 0 and 150');
       expect(result.errors).toContain('Name is required');
     });
+
+    it('should validate user data without age (optional field)', () => {
+      const result = UserService.validateUser({
+        name: 'John Doe',
+        email: 'john@example.com'
+      });
+
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toEqual([]);
+    });
+
+    it('should return errors for missing required fields', () => {
+      const result = UserService.validateUser({
+        name: null as unknown as string,
+        email: undefined as unknown as string
+      });
+
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain('Name is required');
+      expect(result.errors).toContain('Email is required');
+    });
   });
 });
