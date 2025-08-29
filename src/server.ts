@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 import { getDataSource, closeDatabase } from './database/index.js';
 import { usersRouter } from './routes/users.js';
 import { healthRouter } from './routes/health.js';
@@ -25,6 +26,22 @@ async function startServer() {
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
     })
   );
+
+  // Rate limiting
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: process.env.NODE_ENV === 'production' ? 100 : 1000, // Limit each IP to 100 requests per windowMs in production
+    message: {
+      error: 'Too many requests from this IP, please try again later.',
+      retryAfter: 900 // 15 minutes in seconds
+    },
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    // Skip rate limiting for health checks
+    skip: (req) => req.path === '/health'
+  });
+
+  app.use(limiter);
 
   // Middleware
   app.use(express.json());
