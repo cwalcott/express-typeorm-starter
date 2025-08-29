@@ -4,7 +4,7 @@
 
 ### Security Essentials
 - [x] Add `helmet` middleware for security headers
-- [ ] Configure CORS with `cors` package
+- [x] Configure CORS with `cors` package
 - [ ] Implement rate limiting with `express-rate-limit`
 - [ ] Add input validation with `zod` schemas
 - [ ] Configure request size limits

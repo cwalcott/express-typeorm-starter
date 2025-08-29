@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import express from 'express';
 import helmet from 'helmet';
+import cors from 'cors';
 import { getDataSource, closeDatabase } from './database/index.js';
 import { usersRouter } from './routes/users.js';
 import { healthRouter } from './routes/health.js';
@@ -11,6 +12,19 @@ async function startServer() {
 
   // Security middleware
   app.use(helmet());
+
+  // CORS configuration
+  app.use(
+    cors({
+      origin:
+        process.env.NODE_ENV === 'production'
+          ? process.env.ALLOWED_ORIGINS?.split(',') || false
+          : true,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+    })
+  );
 
   // Middleware
   app.use(express.json());
