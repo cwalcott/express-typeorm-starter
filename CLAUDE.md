@@ -52,6 +52,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 If `npm run ci` fails, fix the issues immediately. This catches problems early rather than discovering them at commit time.
 
+**TODO Task Management**: When implementing features or fixes from TODO.md, check off completed items by changing `[ ]` to `[x]` to track progress and maintain project status visibility.
+
 ## Architecture Overview
 
 This is a flexible REST API that supports three database modes through a unified configuration system:
