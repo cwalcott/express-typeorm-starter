@@ -32,6 +32,19 @@ export default tseslint.config(
     }
   },
   {
+    // Type-aware rules for TypeScript files
+    files: ['**/*.ts'],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.json',
+        tsconfigRootDir: import.meta.dirname
+      }
+    },
+    rules: {
+      '@typescript-eslint/no-deprecated': 'warn'
+    }
+  },
+  {
     // Override for test files
     files: ['**/*.test.{js,ts}', '**/*.spec.{js,ts}', 'tests/**/*'],
     rules: {
