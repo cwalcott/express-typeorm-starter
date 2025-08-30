@@ -5,11 +5,13 @@ A modern Node.js REST API starter app with a flexible database setup that suppor
 ## 🌟 Features
 
 - **Flexible Database Configuration**: Seamlessly switch between PGlite and PostgreSQL
+- **Pure Dependency Injection**: Clean architecture with the Composer pattern (no DI framework)
+- **Lightning-Fast Unit Tests**: Test business logic with fake repositories (~300ms for full suite)
 - **Environment-Optimized**: 
   - Development: File-based PGlite with persistent state
   - Testing: In-memory PGlite for fast, isolated tests
   - Production: Full PostgreSQL
-- **Modern Stack**: TypeScript, Express, TypeORM
+- **Modern Stack**: TypeScript, Express, TypeORM with constructor injection
 - **Zero Setup**: Works out of the box without PostgreSQL installation
 - **Smart Fixtures**: Automatically loads development data on first run
 - **Type-Safe**: Full TypeScript coverage with proper entity definitions
@@ -42,12 +44,13 @@ npm test
 src/
 ├── config/              # Database configuration
 ├── database/            # TypeORM setup and fixtures
+├── di/                  # Dependency injection (Composer pattern)
 ├── entities/            # Database entities
-├── routes/              # API route handlers  
-├── services/            # Business logic
+├── routes/              # API route factory functions
+├── services/            # Business logic with dependency injection
 ├── test/
-│   ├── unit/           # Unit tests (business logic)
-│   └── integration/    # Integration tests (database & routes)
+│   ├── unit/           # Unit tests (fast, with fake repositories)
+│   └── integration/    # Integration tests (full stack with real databases)
 │       ├── database/   # Entity integration tests
 │       └── routes/     # HTTP route integration tests
 └── server.ts           # Express server entry point
@@ -129,31 +132,32 @@ npm run format:check # Code formatting check
 
 ### Testing Strategy
 
-This project uses a comprehensive three-layer testing strategy:
+This project uses a comprehensive **three-layer testing strategy** with **dependency injection** for optimal speed and reliability:
 
-**🧪 Unit Tests** (`src/test/unit/`)
-- Test pure business logic in isolation
-- No external dependencies (database, HTTP)
-- Fast execution for quick feedback
-- Example: `UserService` validation functions
+**⚡ Unit Tests** (`src/test/unit/`)
+- **Lightning fast**: ~300ms for entire suite, no database overhead
+- Test business logic with **fake repositories**: `{ findOne: async () => mockUser } as any`
+- Services receive injected dependencies for easy mocking
+- Focus on: error handling, business rules, edge cases, validation
+- Example: `UserService.createUser()` with success/failure/validation scenarios
 
 **🔗 Entity Integration Tests** (`src/test/integration/`)
-- Test database layer with TypeORM entities
-- Use isolated in-memory PGlite databases
-- Test data persistence, constraints, relationships
-- Example: User entity CRUD operations
+- Test database layer with TypeORM entities and **real PGlite databases**
+- Each test gets isolated in-memory database via `src/test/integration/setup.ts`
+- Test data persistence, constraints, relationships, TypeORM behavior
+- Example: User entity CRUD operations, constraint violations
 
 **🌐 Route Integration Tests** (`src/test/integration/`)
-- Test complete HTTP → Route → Service → Database flow
-- Use supertest for real HTTP requests
-- Test full request/response cycle with proper status codes
-- Example: `POST /api/users` with validation, persistence, and error handling
+- Test complete **HTTP → Routes → Services → Database** flow with real Composer
+- Use supertest for real HTTP requests through Express app
+- Created via `src/test/integration/test-app.ts` factory with dependency injection
+- Example: `POST /api/users` with validation, persistence, error handling, status codes
 
-**Benefits:**
-- **Fast feedback**: Unit tests run in milliseconds
-- **Isolated testing**: Each layer tested independently
-- **Full coverage**: From business logic to HTTP endpoints
-- **Reliable CI/CD**: Catches issues at every level
+**🏗️ Architecture Benefits:**
+- **Dependency Injection**: Services constructor-inject repositories, routes inject services
+- **Pure DI Pattern**: Composer class handles wiring (no framework complexity)
+- **Testing Speed**: Unit tests for logic (~2ms each), integration for confidence (~10s suite)
+- **Clear Separation**: Unit (business logic) → Integration (data/HTTP) → Full Stack (E2E)
 
 ## 🏗️ Development Workflow
 
@@ -223,11 +227,23 @@ npm start
 
 ## 🔧 Extending the Project
 
+### Adding New Services
+1. Create service class with constructor injection: `constructor(private repository: Repository<Entity>)`
+2. Add service creation method to `Composer` class in `src/di/composer.ts`
+3. Write fast unit tests with fake repositories in `src/test/unit/`
+4. Update route factory to receive the service as parameter
+
+### Adding New Routes
+1. Create route factory function in `src/routes/` that takes service dependencies
+2. Update `Composer` and server setup to wire the route with dependencies
+3. Add integration tests in `src/test/integration/` using the real composer
+4. Test all HTTP methods, status codes, error cases, and edge cases
+
 ### Adding New Entities
 1. Create entity in `src/entities/`
 2. Add to `dataSource.ts` entities array
 3. Update fixtures if needed
-4. Add routes in `src/routes/`
+4. Follow service and route patterns above
 
 ### Custom Database Logic
 - Modify `src/config/database.ts` for configuration

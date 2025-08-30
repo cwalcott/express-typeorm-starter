@@ -12,7 +12,7 @@ describe('User Routes Integration Tests', () => {
 
   beforeEach(async () => {
     dataSource = await setupTestDB();
-    app = createTestApp();
+    app = await createTestApp();
   });
 
   afterEach(async () => {

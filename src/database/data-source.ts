@@ -5,7 +5,7 @@ import { dirname } from 'node:path';
 import { DatabaseConfig, getDatabaseConfig } from '../config/database.js';
 import { User } from '../entities/user.js';
 
-export async function createDataSource(config?: DatabaseConfig): Promise<DataSource> {
+export function createDataSource(config?: DatabaseConfig): DataSource {
   const dbConfig = config || getDatabaseConfig();
 
   const baseConfig = {

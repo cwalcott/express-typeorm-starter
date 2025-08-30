@@ -46,9 +46,10 @@ export default tseslint.config(
   },
   {
     // Override for test files
-    files: ['**/*.test.{js,ts}', '**/*.spec.{js,ts}', 'tests/**/*'],
+    files: ['**/*.test.{js,ts}', '**/*.spec.{js,ts}', 'tests/**/*', '**/test/**/*'],
     rules: {
-      'n/no-unpublished-import': 'off' // Allow dev dependencies in tests
+      'n/no-unpublished-import': 'off', // Allow dev dependencies in tests
+      '@typescript-eslint/no-explicit-any': 'off' // Allow "as any" in tests for mocking
     }
   },
   {

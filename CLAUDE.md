@@ -65,6 +65,8 @@ npm run ci         # Then run full validation suite
 
 If `npm run ci` fails, fix the issues immediately. This catches problems early rather than discovering them at commit time.
 
+**IMPORTANT: Always run `npm run ci` after making code changes** to catch all issues (TypeScript, linting, formatting, and tests) before considering work complete. If formatting issues are found, run `npm run format` to auto-fix them, then re-run `npm run ci` to verify everything passes.
+
 **CRITICAL: Feature Completion Standards**:
 A feature is NOT considered complete until ALL of the following pass without errors:
 - ✅ `npm run typecheck` - No TypeScript compilation errors
@@ -134,41 +136,61 @@ The core innovation is in `src/config/database.ts` which provides environment-aw
 - Entities are centrally registered in `data-source.ts`
 - PGlite uses the typeorm-pglite adapter for compatibility
 
-### Testing Strategy
-The project uses a comprehensive three-layer testing approach:
+### Dependency Injection & Testing Strategy
+
+**Pure Dependency Injection Pattern**:
+This project uses a "Pure DI" approach without framework complexity:
+
+- **Composer Pattern** (`src/di/composer.ts`): Centralized dependency wiring
+  - `Composer` class handles object construction and dependency injection
+  - `createLiveComposer()` handles environment setup (database initialization)
+  - No decorators, metadata, or runtime magic - everything is compile-time safe
+
+- **Service Layer Architecture**: Services receive dependencies through constructor injection
+  - Services take TypeORM `Repository<T>` directly (no custom repository wrappers)
+  - Routes become factory functions that receive configured services
+  - Clear separation: Routes → Services → Repository → Database
+
+- **Testing Benefits**: 
+  - Unit tests use fake repositories with `as any` (ESLint disabled in test files)
+  - Integration tests use real `createLiveComposer()` with actual databases
+  - Fast unit tests (~2ms) vs slower integration tests (~700ms per setup)
+
+**Three-Layer Testing Approach**:
 
 **Unit Tests** (`src/test/unit/`):
-- Fast execution (no external dependencies)
-- Test pure business logic in isolation
-- Use `npm run test:unit` for quick feedback during development
-- Example: Testing UserService validation functions
+- **Lightning fast execution** (no database, ~0ms overhead per test)
+- Test service business logic with fake repository implementations
+- Use simple object fakes: `{ findOne: async () => mockUser } as any`
+- Focus on: error handling, business rules, edge cases, validation
+- Example: Testing UserService CRUD methods with various success/failure scenarios
 
 **Entity Integration Tests** (`src/test/integration/`):
-- Test database layer with TypeORM entities
+- Test database layer with TypeORM entities and real PGlite databases
 - Use isolated in-memory PGlite databases with automatic fixture loading
 - Each test gets a fresh database instance via `src/test/integration/setup.ts`
-- Example: Testing User entity CRUD operations, constraints
+- Example: Testing User entity CRUD operations, constraints, relationships
 
 **Route Integration Tests** (`src/test/integration/`):
 - Test complete HTTP → Route → Service → Database stack
 - Use supertest for real HTTP requests through Express app
-- Created via `src/test/integration/test-app.ts` factory
+- Created via `src/test/integration/test-app.ts` factory with real composer
 - Test full request/response cycle with proper status codes, validation, error handling
 - Example: `POST /api/users` with input validation, database persistence, unique constraints
-- Use `npm run test:integration` for complete end-to-end validation
 
-**When adding new routes:**
-1. Create route handler in `src/routes/`
-2. Add corresponding integration tests in `src/test/integration/`
-3. Test all HTTP methods, status codes, error cases, and edge cases
-4. Use the existing `test-app.ts` factory for consistent Express app setup
+**Development Workflow**:
+1. Write unit tests for service logic (fast feedback loop)
+2. Write integration tests for HTTP endpoints (full stack validation)
+3. Use `npm run test:unit` during development, `npm run test:integration` for confidence
+4. Unit tests run in ~300ms, integration tests in ~10s
 
 ### File Structure Key Points
 - `src/entities/` - TypeORM entity definitions
-- `src/routes/` - Express route handlers  
-- `src/services/` - Business logic and pure functions
-- `src/test/unit/` - Unit tests for business logic
-- `src/test/integration/` - Entity and route integration tests
+- `src/routes/` - Express route factory functions (receive injected services)
+- `src/services/` - Business logic with constructor-injected dependencies
+- `src/di/` - Dependency injection and composition root
+- `src/test/unit/` - Fast unit tests for service logic with fake repositories
+- `src/test/integration/` - Entity and route integration tests with real databases
   - `setup.ts` - Test database configuration
   - `test-app.ts` - Express app factory for HTTP testing
   - `*-routes.test.ts` - HTTP endpoint tests using supertest
@@ -176,19 +198,31 @@ The project uses a comprehensive three-layer testing approach:
 - `./data/` - PGlite database files (gitignored)
 - Routes follow REST conventions under `/api/` prefix
 
+**When adding new services:**
+1. Create service class with constructor injection: `constructor(private repository: Repository<Entity>)`
+2. Add service creation method to `Composer` class
+3. Write fast unit tests with fake repositories in `src/test/unit/`
+4. Update route factory to receive the service as parameter
+
+**When adding new routes:**
+1. Create route factory function in `src/routes/` that takes service dependencies
+2. Update `Composer` and server setup to wire the route with dependencies
+3. Add integration tests in `src/test/integration/` using the real composer
+4. Test all HTTP methods, status codes, error cases, and edge cases
+
 ## File Naming Conventions
 
 This project follows **kebab-case** naming for all TypeScript files:
 
 - **Entities**: `user.ts` (matches class name `User`)
-- **Services**: `user-service.ts` 
+- **Services**: `user.service.ts` 
 - **Routes**: `users.ts` (plural for REST endpoints)
-- **Tests**: `user-service.test.ts`, `user.test.ts`
+- **Tests**: `user.service.test.ts`, `user.test.ts`
 - **Utilities**: `data-source.ts`
 
 Examples:
 - ✅ `src/entities/user.ts`
-- ✅ `src/services/user-service.ts`
-- ✅ `src/test/unit/user-service.test.ts`
+- ✅ `src/services/user.service.ts`
+- ✅ `src/test/unit/user.service.test.ts`
 - ❌ `src/entities/User.ts`
 - ❌ `src/services/UserService.ts`

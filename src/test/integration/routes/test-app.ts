@@ -2,8 +2,11 @@ import 'reflect-metadata';
 import express from 'express';
 import { usersRouter } from '../../../routes/users.js';
 import { healthRouter } from '../../../routes/health.js';
+import { createLiveComposer } from '../../../di/composer.js';
 
-export function createTestApp(): express.Express {
+export async function createTestApp(): Promise<express.Express> {
+  const composer = await createLiveComposer();
+
   const app = express();
 
   // Middleware
@@ -14,7 +17,7 @@ export function createTestApp(): express.Express {
   app.use(healthRouter);
 
   // API routes
-  app.use('/api/users', usersRouter);
+  app.use('/api/users', usersRouter(composer.createUserService()));
 
   // Error handling
   app.use((_, res) => {

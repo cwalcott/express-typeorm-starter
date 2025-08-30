@@ -8,7 +8,7 @@ let dataSource: DataSource | null = null;
 export async function getDataSource(): Promise<DataSource> {
   if (!dataSource) {
     const config = getDatabaseConfig();
-    dataSource = await createDataSource(config);
+    dataSource = createDataSource(config);
     await initializeDatabase(dataSource, config);
   }
 

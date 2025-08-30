@@ -1,4 +1,4 @@
-import { getDataSource } from '../database/index.js';
+import { Repository } from 'typeorm';
 import { User } from '../entities/user.js';
 
 type ServiceResult<T> =
@@ -6,14 +6,11 @@ type ServiceResult<T> =
   | { success: false; error: string; statusCode: number };
 
 export class UserService {
-  /**
-   * Get all users
-   */
-  static async getAllUsers(): Promise<ServiceResult<User[]>> {
+  constructor(private readonly userRepository: Repository<User>) {}
+
+  async getAllUsers(): Promise<ServiceResult<User[]>> {
     try {
-      const dataSource = await getDataSource();
-      const userRepo = dataSource.getRepository(User);
-      const users = await userRepo.find({ order: { createdAt: 'DESC' } });
+      const users = await this.userRepository.find({ order: { createdAt: 'DESC' } });
 
       return { success: true, data: users };
     } catch {
@@ -25,14 +22,9 @@ export class UserService {
     }
   }
 
-  /**
-   * Get user by ID
-   */
-  static async getUserById(id: number): Promise<ServiceResult<User>> {
+  async getUserById(id: number): Promise<ServiceResult<User>> {
     try {
-      const dataSource = await getDataSource();
-      const userRepo = dataSource.getRepository(User);
-      const user = await userRepo.findOne({ where: { id } });
+      const user = await this.userRepository.findOne({ where: { id } });
 
       if (!user) {
         return {
@@ -52,25 +44,19 @@ export class UserService {
     }
   }
 
-  /**
-   * Create a new user
-   */
-  static async createUser(userData: {
+  async createUser(userData: {
     name: string;
     email: string;
     age?: number;
   }): Promise<ServiceResult<User>> {
     try {
-      const dataSource = await getDataSource();
-      const userRepo = dataSource.getRepository(User);
-
-      const user = userRepo.create({
+      const user = this.userRepository.create({
         name: userData.name, // Already sanitized by Zod
         email: userData.email, // Already normalized by Zod
         age: userData.age
       });
 
-      const savedUser = await userRepo.save(user);
+      const savedUser = await this.userRepository.save(user);
       return { success: true, data: savedUser };
     } catch (error) {
       if ((error as { code?: string }).code === '23505') {
@@ -88,18 +74,12 @@ export class UserService {
     }
   }
 
-  /**
-   * Update an existing user
-   */
-  static async updateUser(
+  async updateUser(
     id: number,
     userData: { name?: string; email?: string; age?: number }
   ): Promise<ServiceResult<User>> {
     try {
-      const dataSource = await getDataSource();
-      const userRepo = dataSource.getRepository(User);
-
-      const user = await userRepo.findOne({ where: { id } });
+      const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
         return {
           success: false,
@@ -118,7 +98,7 @@ export class UserService {
         user.age = userData.age;
       }
 
-      const updatedUser = await userRepo.save(user);
+      const updatedUser = await this.userRepository.save(user);
       return { success: true, data: updatedUser };
     } catch (error) {
       if ((error as { code?: string }).code === '23505') {
@@ -136,16 +116,10 @@ export class UserService {
     }
   }
 
-  /**
-   * Delete a user
-   */
-  static async deleteUser(id: number): Promise<ServiceResult<void>> {
+  async deleteUser(id: number): Promise<ServiceResult<void>> {
     try {
-      const dataSource = await getDataSource();
-      const userRepo = dataSource.getRepository(User);
-
       // Check if user exists first
-      const user = await userRepo.findOne({ where: { id } });
+      const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
         return {
           success: false,
@@ -154,7 +128,7 @@ export class UserService {
         };
       }
 
-      await userRepo.delete(id);
+      await this.userRepository.delete(id);
       return { success: true, data: undefined };
     } catch {
       return {

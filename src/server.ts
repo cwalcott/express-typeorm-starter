@@ -6,8 +6,11 @@ import rateLimit from 'express-rate-limit';
 import { getDataSource, closeDatabase } from './database/index.js';
 import { usersRouter } from './routes/users.js';
 import { healthRouter } from './routes/health.js';
+import { createLiveComposer } from './di/composer.js';
 
 async function startServer() {
+  const composer = await createLiveComposer();
+
   const app = express();
   const port = process.env.PORT || 3000;
 
@@ -71,7 +74,7 @@ async function startServer() {
   app.use(healthRouter);
 
   // API routes
-  app.use('/api/users', usersRouter);
+  app.use('/api/users', usersRouter(composer.createUserService()));
 
   // Error handling
   app.use((_, res) => {
