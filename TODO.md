@@ -6,7 +6,7 @@
 - [x] Add `helmet` middleware for security headers
 - [x] Configure CORS with `cors` package
 - [x] Implement rate limiting with `express-rate-limit`
-- [ ] Add input validation with `zod` schemas
+- [x] Add input validation with `zod` schemas
 - [ ] Configure request size limits
 - [ ] Add input sanitization
 

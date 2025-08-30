@@ -7,79 +7,6 @@ type ServiceResult<T> =
 
 export class UserService {
   /**
-   * Validates email format using a simple regex
-   */
-  static validateEmail(email: string): boolean {
-    if (!email || typeof email !== 'string') {
-      return false;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email.trim());
-  }
-
-  /**
-   * Validates age is within reasonable bounds
-   */
-  static validateAge(age: number): boolean {
-    if (typeof age !== 'number' || isNaN(age)) {
-      return false;
-    }
-
-    return age >= 0 && age <= 150;
-  }
-
-  /**
-   * Sanitizes name by trimming whitespace and capitalizing first letter of each word
-   */
-  static sanitizeName(name: string): string {
-    if (!name || typeof name !== 'string') {
-      return '';
-    }
-
-    return name
-      .trim()
-      .split(' ')
-      .filter((word) => word.length > 0)
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
-  }
-
-  /**
-   * Validates complete user data
-   */
-  static validateUser(userData: { name: string; email: string; age?: number }): {
-    isValid: boolean;
-    errors: string[];
-  } {
-    const errors: string[] = [];
-
-    if (!userData.name || typeof userData.name !== 'string') {
-      errors.push('Name is required');
-    } else {
-      const sanitizedName = this.sanitizeName(userData.name);
-      if (!sanitizedName) {
-        errors.push('Name is required');
-      }
-    }
-
-    if (!userData.email || typeof userData.email !== 'string') {
-      errors.push('Email is required');
-    } else if (!this.validateEmail(userData.email)) {
-      errors.push('Invalid email format');
-    }
-
-    if (userData.age !== undefined && !this.validateAge(userData.age)) {
-      errors.push('Age must be between 0 and 150');
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors
-    };
-  }
-
-  /**
    * Get all users
    */
   static async getAllUsers(): Promise<ServiceResult<User[]>> {
@@ -103,14 +30,6 @@ export class UserService {
    */
   static async getUserById(id: number): Promise<ServiceResult<User>> {
     try {
-      if (!id || isNaN(id)) {
-        return {
-          success: false,
-          error: 'Invalid user ID',
-          statusCode: 400
-        };
-      }
-
       const dataSource = await getDataSource();
       const userRepo = dataSource.getRepository(User);
       const user = await userRepo.findOne({ where: { id } });
@@ -142,22 +61,12 @@ export class UserService {
     age?: number;
   }): Promise<ServiceResult<User>> {
     try {
-      const validation = this.validateUser(userData);
-      if (!validation.isValid) {
-        return {
-          success: false,
-          error: validation.errors.join(', '),
-          statusCode: 400
-        };
-      }
-
       const dataSource = await getDataSource();
       const userRepo = dataSource.getRepository(User);
 
-      const sanitizedName = this.sanitizeName(userData.name);
       const user = userRepo.create({
-        name: sanitizedName,
-        email: userData.email.trim().toLowerCase(),
+        name: userData.name, // Already sanitized by Zod
+        email: userData.email, // Already normalized by Zod
         age: userData.age
       });
 
@@ -187,48 +96,6 @@ export class UserService {
     userData: { name?: string; email?: string; age?: number }
   ): Promise<ServiceResult<User>> {
     try {
-      if (!id || isNaN(id)) {
-        return {
-          success: false,
-          error: 'Invalid user ID',
-          statusCode: 400
-        };
-      }
-
-      // Validate each field individually for updates
-      const errors: string[] = [];
-
-      if (userData.name !== undefined) {
-        if (!userData.name || typeof userData.name !== 'string') {
-          errors.push('Name is required');
-        } else {
-          const sanitizedName = this.sanitizeName(userData.name);
-          if (!sanitizedName) {
-            errors.push('Name is required');
-          }
-        }
-      }
-
-      if (userData.email !== undefined) {
-        if (!userData.email || typeof userData.email !== 'string') {
-          errors.push('Email is required');
-        } else if (!this.validateEmail(userData.email)) {
-          errors.push('Invalid email format');
-        }
-      }
-
-      if (userData.age !== undefined && !this.validateAge(userData.age)) {
-        errors.push('Age must be between 0 and 150');
-      }
-
-      if (errors.length > 0) {
-        return {
-          success: false,
-          error: errors.join(', '),
-          statusCode: 400
-        };
-      }
-
       const dataSource = await getDataSource();
       const userRepo = dataSource.getRepository(User);
 
@@ -242,10 +109,10 @@ export class UserService {
       }
 
       if (userData.name !== undefined) {
-        user.name = this.sanitizeName(userData.name);
+        user.name = userData.name; // Already sanitized by Zod
       }
       if (userData.email !== undefined) {
-        user.email = userData.email.trim().toLowerCase();
+        user.email = userData.email; // Already normalized by Zod
       }
       if (userData.age !== undefined) {
         user.age = userData.age;
@@ -274,14 +141,6 @@ export class UserService {
    */
   static async deleteUser(id: number): Promise<ServiceResult<void>> {
     try {
-      if (!id || isNaN(id)) {
-        return {
-          success: false,
-          error: 'Invalid user ID',
-          statusCode: 400
-        };
-      }
-
       const dataSource = await getDataSource();
       const userRepo = dataSource.getRepository(User);
 

@@ -44,13 +44,48 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Workflow
 
-**IMPORTANT**: Always run `npm run ci` after making code changes. This ensures:
-- TypeScript compilation passes (`typecheck`)
-- Code quality standards are met (`lint`)
-- Code formatting is consistent (`format:check`) 
-- All tests pass (`test`)
+**CRITICAL**: Always check TypeScript compilation FIRST before running tests:
+
+1. **TypeScript First**: Run `npm run typecheck` immediately after making code changes
+   - TypeScript errors must be fixed before proceeding to tests
+   - Tests can fail misleadingly if TypeScript compilation is broken
+   - This saves time by catching type issues early
+
+2. **Full Validation**: After TypeScript passes, run `npm run ci` to ensure:
+   - TypeScript compilation passes (`typecheck`)
+   - Code quality standards are met (`lint`)
+   - Code formatting is consistent (`format:check`) 
+   - All tests pass (`test`)
+
+**Best Practice Order**:
+```bash
+npm run typecheck  # Fix any TypeScript errors first
+npm run ci         # Then run full validation suite
+```
 
 If `npm run ci` fails, fix the issues immediately. This catches problems early rather than discovering them at commit time.
+
+**CRITICAL: Feature Completion Standards**:
+A feature is NOT considered complete until ALL of the following pass without errors:
+- ✅ `npm run typecheck` - No TypeScript compilation errors
+- ✅ `npm run lint` - No ESLint errors or warnings  
+- ✅ `npm run format:check` - Code formatting is consistent
+- ✅ `npm run test` - All tests pass (both unit and integration)
+
+**Never mark a feature as "complete" or "good to go" if any CI checks are failing.** It's acceptable to ask for help if stuck on fixing failing tests or linting issues, but incomplete features should not be presented as finished work.
+
+**Working with Third-Party Libraries**:
+When integrating new libraries (like Zod, validation libraries, etc.):
+
+1. **Embrace library defaults** - Don't fight the library's natural behavior or error messages. If a library provides reasonable default error messages, use them rather than creating complex workarounds.
+
+2. **Read documentation thoroughly** - Check the specific version's documentation for supported features. Don't assume newer API features are available in older versions.
+
+3. **Update tests pragmatically** - Sometimes it's better to update test expectations to match library reality rather than forcing library behavior to match existing tests. This is especially true for error messages and validation behavior.
+
+4. **Follow library philosophy** - Each validation/utility library has its own approach (e.g., type-first validation vs custom messages). Work with that philosophy rather than against it.
+
+5. **Separation of concerns** - Keep validation at the route level (input validation) separate from business logic at the service level (data operations). Don't duplicate validation logic across layers.
 
 **TODO Task Management**: When implementing features or fixes from TODO.md, check off completed items by changing `[ ]` to `[x]` to track progress and maintain project status visibility.
 

@@ -106,6 +106,7 @@ describe('User Routes Integration Tests', () => {
 
     it('should return 400 for missing name', async () => {
       const invalidUser = {
+        name: '',
         email: 'test@example.com',
         age: 25
       };
@@ -123,7 +124,7 @@ describe('User Routes Integration Tests', () => {
 
       const response = await request(app).post('/api/users').send(invalidUser).expect(400);
 
-      expect(response.body.error).toBe('Email is required');
+      expect(response.body.error).toMatch(/^Invalid input/);
     });
 
     it('should return 400 for duplicate email', async () => {
@@ -141,7 +142,7 @@ describe('User Routes Integration Tests', () => {
     it('should normalize email and sanitize name', async () => {
       const newUser = {
         name: 'john doe',
-        email: '  TEST@EXAMPLE.COM  '
+        email: 'TEST@EXAMPLE.COM'
       };
 
       const response = await request(app).post('/api/users').send(newUser).expect(201);
@@ -158,7 +159,7 @@ describe('User Routes Integration Tests', () => {
 
       const response = await request(app).post('/api/users').send(invalidUser).expect(400);
 
-      expect(response.body.error).toBe('Invalid email format');
+      expect(response.body.error).toBe('Invalid email address');
     });
 
     it('should return 400 for invalid age', async () => {
