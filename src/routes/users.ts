@@ -1,26 +1,7 @@
-import { Request, Response, Router } from 'express';
+import { Request, Router } from 'express';
 import { UserService } from '../services/user.service.js';
 import { UserSchema } from '../validators/user-validators.js';
-
-type ApiResponse<T> =
-  | { success: true; status: 200 | 201; data: T }
-  | { success: true; status: 204; data?: never }
-  | { success: false; status: 400 | 401 | 403 | 404 | 422 | 500; error: string };
-
-function createApiRoute<T>(handler: (req: Request) => Promise<ApiResponse<T>>) {
-  return async (req: Request, res: Response) => {
-    const response = await handler(req);
-    if (response.success) {
-      if (response.data) {
-        res.status(response.status).json(response.data);
-      } else {
-        res.status(response.status).send();
-      }
-    } else {
-      res.status(response.status).json({ error: response.error });
-    }
-  };
-}
+import { handleApiResponse } from './api.js';
 
 export function usersRouter(userService: UserService): Router {
   const router = Router();
@@ -28,7 +9,7 @@ export function usersRouter(userService: UserService): Router {
   // GET /users - List all users
   router.get(
     '/',
-    createApiRoute(async () => {
+    handleApiResponse(async () => {
       const result = await userService.getAllUsers();
 
       if (result.success) {
@@ -42,9 +23,8 @@ export function usersRouter(userService: UserService): Router {
   // GET /users/:id - Get user by ID
   router.get(
     '/:id',
-    createApiRoute(async (req: Request) => {
+    handleApiResponse(async (req: Request) => {
       const id = parseInt(req.params.id);
-
       if (!id || isNaN(id)) {
         return { success: false, status: 400, error: 'Invalid user ID' };
       }
@@ -67,15 +47,13 @@ export function usersRouter(userService: UserService): Router {
   // POST /users - Create new user
   router.post(
     '/',
-    createApiRoute(async (req: Request) => {
+    handleApiResponse(async (req: Request) => {
       const parsed = UserSchema.safeParse(req.body);
       if (!parsed.success) {
         return { success: false, status: 400, error: parsed.error.issues[0].message };
       }
 
-      const { name, email, age } = parsed.data;
-      const result = await userService.createUser({ name, email, age });
-
+      const result = await userService.createUser(parsed.data);
       if (result.success) {
         return { success: true, status: 201, data: result.data };
       } else {
@@ -92,9 +70,8 @@ export function usersRouter(userService: UserService): Router {
   // PUT /users/:id - Update user
   router.put(
     '/:id',
-    createApiRoute(async (req: Request) => {
+    handleApiResponse(async (req: Request) => {
       const id = parseInt(req.params.id);
-
       if (!id || isNaN(id)) {
         return { success: false, status: 400, error: 'Invalid user ID' };
       }
@@ -103,9 +80,8 @@ export function usersRouter(userService: UserService): Router {
       if (!parsed.success) {
         return { success: false, status: 400, error: parsed.error.issues[0].message };
       }
-      const { name, email, age } = parsed.data;
-      const result = await userService.updateUser(id, { name, email, age });
 
+      const result = await userService.updateUser(id, parsed.data);
       if (result.success) {
         return { success: true, status: 200, data: result.data };
       } else {
@@ -124,15 +100,13 @@ export function usersRouter(userService: UserService): Router {
   // DELETE /users/:id - Delete user
   router.delete(
     '/:id',
-    createApiRoute(async (req: Request) => {
+    handleApiResponse(async (req: Request) => {
       const id = parseInt(req.params.id);
-
       if (!id || isNaN(id)) {
         return { success: false, status: 400, error: 'Invalid user ID' };
       }
 
       const result = await userService.deleteUser(id);
-
       if (result.success) {
         return { success: true, status: 204 };
       } else {
