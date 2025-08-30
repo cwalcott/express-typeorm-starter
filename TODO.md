@@ -1,4 +1,4 @@
-# Express TypeORM Starter - Enhancement TODO
+# TypeScript AI Playground - Enhancement TODO
 
 ## 🚨 High Priority - Security & Production Readiness
 

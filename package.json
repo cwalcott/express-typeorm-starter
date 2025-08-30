@@ -1,7 +1,7 @@
 {
-  "name": "express-typeorm-starter",
+  "name": "typescript-ai-playground",
   "version": "1.0.0",
-  "description": "REST API with flexible PGlite/PostgreSQL database setup",
+  "description": "TypeScript architecture playground for AI-assisted development experiments",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx src/server.ts",

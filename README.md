@@ -1,19 +1,20 @@
-# Express TypeORM Starter
+# TypeScript AI Playground
 
-A modern Node.js REST API starter app with a flexible database setup that supports both PGlite (embedded PostgreSQL) and full PostgreSQL, designed for optimal developer experience across different environments.
+A TypeScript architecture playground for experimenting with AI-assisted development patterns. Features flexible database setup (PGlite/PostgreSQL), pure dependency injection, comprehensive testing strategies, and patterns optimized for Claude Code collaboration.
 
 ## 🌟 Features
 
-- **Flexible Database Configuration**: Seamlessly switch between PGlite and PostgreSQL
+- **AI-Assisted Development**: Patterns and documentation optimized for Claude Code collaboration
 - **Pure Dependency Injection**: Clean architecture with the Composer pattern (no DI framework)
+- **Flexible Database Configuration**: Seamlessly switch between PGlite and PostgreSQL
 - **Lightning-Fast Unit Tests**: Test business logic with fake repositories (~300ms for full suite)
+- **Architecture Experiments**: Playground for testing different TypeScript patterns
 - **Environment-Optimized**: 
   - Development: File-based PGlite with persistent state
   - Testing: In-memory PGlite for fast, isolated tests
   - Production: Full PostgreSQL
 - **Modern Stack**: TypeScript, Express, TypeORM with constructor injection
 - **Zero Setup**: Works out of the box without PostgreSQL installation
-- **Smart Fixtures**: Automatically loads development data on first run
 - **Type-Safe**: Full TypeScript coverage with proper entity definitions
 
 ## 🚀 Quick Start
@@ -293,7 +294,7 @@ npm run reset       # Clean reinstall
 
 ## 📝 License
 
-MIT License - feel free to use this as a starting point for your projects!
+MIT License - feel free to use this as a playground for your TypeScript and AI development experiments!
 
 ## 🙋‍♂️ Need Help?
 
