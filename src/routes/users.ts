@@ -1,107 +1,150 @@
-import { Router, Request, Response } from 'express';
+import { Request, Response, Router } from 'express';
 import { UserService } from '../services/user.service.js';
 import { UserSchema } from '../validators/user-validators.js';
+
+type ApiResponse<T> =
+  | { success: true; status: 200 | 201; data: T }
+  | { success: true; status: 204; data?: never }
+  | { success: false; status: 400 | 401 | 403 | 404 | 422 | 500; error: string };
+
+function createApiRoute<T>(handler: (req: Request) => Promise<ApiResponse<T>>) {
+  return async (req: Request, res: Response) => {
+    const response = await handler(req);
+    if (response.success) {
+      if (response.data) {
+        res.status(response.status).json(response.data);
+      } else {
+        res.status(response.status).send();
+      }
+    } else {
+      res.status(response.status).json({ error: response.error });
+    }
+  };
+}
 
 export function usersRouter(userService: UserService): Router {
   const router = Router();
 
   // GET /users - List all users
-  router.get('/', async (_req: Request, res: Response) => {
-    const result = await userService.getAllUsers();
+  router.get(
+    '/',
+    createApiRoute(async () => {
+      const result = await userService.getAllUsers();
 
-    if (result.success) {
-      res.json(result.data);
-    } else if (result.error === 'database_error') {
-      res.status(500).json({ error: 'Failed to fetch users' });
-    }
-  });
+      if (result.success) {
+        return { success: true, status: 200, data: result.data };
+      } else {
+        return { success: false, status: 500, error: 'Failed to fetch users' };
+      }
+    })
+  );
 
   // GET /users/:id - Get user by ID
-  router.get('/:id', async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id);
+  router.get(
+    '/:id',
+    createApiRoute(async (req: Request) => {
+      const id = parseInt(req.params.id);
 
-    if (!id || isNaN(id)) {
-      res.status(400).json({ error: 'Invalid user ID' });
-      return;
-    }
+      if (!id || isNaN(id)) {
+        return { success: false, status: 400, error: 'Invalid user ID' };
+      }
 
-    const result = await userService.getUserById(id);
+      const result = await userService.getUserById(id);
 
-    if (result.success) {
-      res.json(result.data);
-    } else if (result.error === 'not_found') {
-      res.status(404).json({ error: 'User not found' });
-    } else if (result.error === 'database_error') {
-      res.status(500).json({ error: 'Failed to fetch user' });
-    }
-  });
+      if (result.success) {
+        return { success: true, status: 200, data: result.data };
+      } else {
+        switch (result.error) {
+          case 'not_found':
+            return { success: false, status: 404, error: 'User not found' };
+          case 'database_error':
+            return { success: false, status: 500, error: 'Failed to fetch user' };
+        }
+      }
+    })
+  );
 
   // POST /users - Create new user
-  router.post('/', async (req, res) => {
-    const parsed = UserSchema.safeParse(req.body);
-    if (parsed.success) {
+  router.post(
+    '/',
+    createApiRoute(async (req: Request) => {
+      const parsed = UserSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return { success: false, status: 400, error: parsed.error.issues[0].message };
+      }
+
       const { name, email, age } = parsed.data;
       const result = await userService.createUser({ name, email, age });
 
       if (result.success) {
-        res.status(201).json(result.data);
-      } else if (result.error === 'email_exists') {
-        res.status(400).json({ error: 'Email already exists' });
-      } else if (result.error === 'database_error') {
-        res.status(500).json({ error: 'Failed to create user' });
+        return { success: true, status: 201, data: result.data };
+      } else {
+        switch (result.error) {
+          case 'email_exists':
+            return { success: false, status: 400, error: 'Email already exists' };
+          case 'database_error':
+            return { success: false, status: 500, error: 'Failed to create user' };
+        }
       }
-    } else {
-      res.status(400).json({ error: parsed.error.issues[0].message });
-    }
-  });
+    })
+  );
 
   // PUT /users/:id - Update user
-  router.put('/:id', async (req, res) => {
-    const id = parseInt(req.params.id);
+  router.put(
+    '/:id',
+    createApiRoute(async (req: Request) => {
+      const id = parseInt(req.params.id);
 
-    if (!id || isNaN(id)) {
-      res.status(400).json({ error: 'Invalid user ID' });
-      return;
-    }
+      if (!id || isNaN(id)) {
+        return { success: false, status: 400, error: 'Invalid user ID' };
+      }
 
-    const parsed = UserSchema.partial().safeParse(req.body);
-    if (parsed.success) {
+      const parsed = UserSchema.partial().safeParse(req.body);
+      if (!parsed.success) {
+        return { success: false, status: 400, error: parsed.error.issues[0].message };
+      }
       const { name, email, age } = parsed.data;
       const result = await userService.updateUser(id, { name, email, age });
 
       if (result.success) {
-        res.json(result.data);
-      } else if (result.error === 'email_exists') {
-        res.status(400).json({ error: 'Email already exists' });
-      } else if (result.error === 'not_found') {
-        res.status(404).json({ error: 'User not found' });
-      } else if (result.error === 'database_error') {
-        res.status(500).json({ error: 'Failed to update user' });
+        return { success: true, status: 200, data: result.data };
+      } else {
+        switch (result.error) {
+          case 'email_exists':
+            return { success: false, status: 400, error: 'Email already exists' };
+          case 'not_found':
+            return { success: false, status: 404, error: 'User not found' };
+          case 'database_error':
+            return { success: false, status: 500, error: 'Failed to update user' };
+        }
       }
-    } else {
-      res.status(400).json({ error: parsed.error.issues[0].message });
-    }
-  });
+    })
+  );
 
   // DELETE /users/:id - Delete user
-  router.delete('/:id', async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id);
+  router.delete(
+    '/:id',
+    createApiRoute(async (req: Request) => {
+      const id = parseInt(req.params.id);
 
-    if (!id || isNaN(id)) {
-      res.status(400).json({ error: 'Invalid user ID' });
-      return;
-    }
+      if (!id || isNaN(id)) {
+        return { success: false, status: 400, error: 'Invalid user ID' };
+      }
 
-    const result = await userService.deleteUser(id);
+      const result = await userService.deleteUser(id);
 
-    if (result.success) {
-      res.status(204).send();
-    } else if (result.error === 'not_found') {
-      res.status(404).json({ error: 'User not found' });
-    } else if (result.error === 'database_error') {
-      res.status(500).json({ error: 'Failed to delete user' });
-    }
-  });
+      if (result.success) {
+        return { success: true, status: 204 };
+      } else {
+        switch (result.error) {
+          case 'not_found':
+            return { success: false, status: 404, error: 'User not found' };
+          case 'database_error':
+            return { success: false, status: 500, error: 'Failed to delete user' };
+        }
+      }
+    })
+  );
 
   return router;
 }
