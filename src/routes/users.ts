@@ -11,8 +11,8 @@ export function usersRouter(userService: UserService): Router {
 
     if (result.success) {
       res.json(result.data);
-    } else {
-      res.status(result.statusCode).json({ error: result.error });
+    } else if (result.error === 'database_error') {
+      res.status(500).json({ error: 'Failed to fetch users' });
     }
   });
 
@@ -29,8 +29,10 @@ export function usersRouter(userService: UserService): Router {
 
     if (result.success) {
       res.json(result.data);
-    } else {
-      res.status(result.statusCode).json({ error: result.error });
+    } else if (result.error === 'not_found') {
+      res.status(404).json({ error: 'User not found' });
+    } else if (result.error === 'database_error') {
+      res.status(500).json({ error: 'Failed to fetch user' });
     }
   });
 
@@ -43,8 +45,10 @@ export function usersRouter(userService: UserService): Router {
 
       if (result.success) {
         res.status(201).json(result.data);
-      } else {
-        res.status(result.statusCode).json({ error: result.error });
+      } else if (result.error === 'email_exists') {
+        res.status(400).json({ error: 'Email already exists' });
+      } else if (result.error === 'database_error') {
+        res.status(500).json({ error: 'Failed to create user' });
       }
     } else {
       res.status(400).json({ error: parsed.error.issues[0].message });
@@ -67,8 +71,12 @@ export function usersRouter(userService: UserService): Router {
 
       if (result.success) {
         res.json(result.data);
-      } else {
-        res.status(result.statusCode).json({ error: result.error });
+      } else if (result.error === 'email_exists') {
+        res.status(400).json({ error: 'Email already exists' });
+      } else if (result.error === 'not_found') {
+        res.status(404).json({ error: 'User not found' });
+      } else if (result.error === 'database_error') {
+        res.status(500).json({ error: 'Failed to update user' });
       }
     } else {
       res.status(400).json({ error: parsed.error.issues[0].message });
@@ -88,8 +96,10 @@ export function usersRouter(userService: UserService): Router {
 
     if (result.success) {
       res.status(204).send();
-    } else {
-      res.status(result.statusCode).json({ error: result.error });
+    } else if (result.error === 'not_found') {
+      res.status(404).json({ error: 'User not found' });
+    } else if (result.error === 'database_error') {
+      res.status(500).json({ error: 'Failed to delete user' });
     }
   });
 

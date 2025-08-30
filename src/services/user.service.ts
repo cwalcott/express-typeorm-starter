@@ -1,46 +1,31 @@
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.js';
 
-type ServiceResult<T> =
-  | { success: true; data: T }
-  | { success: false; error: string; statusCode: number };
+type Result<T, E = Error> = { success: true; data: T } | { success: false; error: E };
 
 export class UserService {
   constructor(private readonly userRepository: Repository<User>) {}
 
-  async getAllUsers(): Promise<ServiceResult<User[]>> {
+  async getAllUsers(): Promise<Result<User[], 'database_error'>> {
     try {
       const users = await this.userRepository.find({ order: { createdAt: 'DESC' } });
-
       return { success: true, data: users };
     } catch {
-      return {
-        success: false,
-        error: 'Failed to fetch users',
-        statusCode: 500
-      };
+      return { success: false, error: 'database_error' };
     }
   }
 
-  async getUserById(id: number): Promise<ServiceResult<User>> {
+  async getUserById(id: number): Promise<Result<User, 'not_found' | 'database_error'>> {
     try {
       const user = await this.userRepository.findOne({ where: { id } });
 
       if (!user) {
-        return {
-          success: false,
-          error: 'User not found',
-          statusCode: 404
-        };
+        return { success: false, error: 'not_found' };
       }
 
       return { success: true, data: user };
     } catch {
-      return {
-        success: false,
-        error: 'Failed to fetch user',
-        statusCode: 500
-      };
+      return { success: false, error: 'database_error' };
     }
   }
 
@@ -48,11 +33,11 @@ export class UserService {
     name: string;
     email: string;
     age?: number;
-  }): Promise<ServiceResult<User>> {
+  }): Promise<Result<User, 'email_exists' | 'database_error'>> {
     try {
       const user = this.userRepository.create({
-        name: userData.name, // Already sanitized by Zod
-        email: userData.email, // Already normalized by Zod
+        name: userData.name,
+        email: userData.email,
         age: userData.age
       });
 
@@ -60,39 +45,28 @@ export class UserService {
       return { success: true, data: savedUser };
     } catch (error) {
       if ((error as { code?: string }).code === '23505') {
-        return {
-          success: false,
-          error: 'Email already exists',
-          statusCode: 400
-        };
+        return { success: false, error: 'email_exists' };
       }
-      return {
-        success: false,
-        error: 'Failed to create user',
-        statusCode: 500
-      };
+
+      return { success: false, error: 'database_error' };
     }
   }
 
   async updateUser(
     id: number,
     userData: { name?: string; email?: string; age?: number }
-  ): Promise<ServiceResult<User>> {
+  ): Promise<Result<User, 'email_exists' | 'not_found' | 'database_error'>> {
     try {
       const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
-        return {
-          success: false,
-          error: 'User not found',
-          statusCode: 404
-        };
+        return { success: false, error: 'not_found' };
       }
 
       if (userData.name !== undefined) {
-        user.name = userData.name; // Already sanitized by Zod
+        user.name = userData.name;
       }
       if (userData.email !== undefined) {
-        user.email = userData.email; // Already normalized by Zod
+        user.email = userData.email;
       }
       if (userData.age !== undefined) {
         user.age = userData.age;
@@ -102,40 +76,24 @@ export class UserService {
       return { success: true, data: updatedUser };
     } catch (error) {
       if ((error as { code?: string }).code === '23505') {
-        return {
-          success: false,
-          error: 'Email already exists',
-          statusCode: 400
-        };
+        return { success: false, error: 'email_exists' };
       }
-      return {
-        success: false,
-        error: 'Failed to update user',
-        statusCode: 500
-      };
+
+      return { success: false, error: 'database_error' };
     }
   }
 
-  async deleteUser(id: number): Promise<ServiceResult<void>> {
+  async deleteUser(id: number): Promise<Result<void, 'not_found' | 'database_error'>> {
     try {
-      // Check if user exists first
       const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
-        return {
-          success: false,
-          error: 'User not found',
-          statusCode: 404
-        };
+        return { success: false, error: 'not_found' };
       }
 
       await this.userRepository.delete(id);
       return { success: true, data: undefined };
     } catch {
-      return {
-        success: false,
-        error: 'Failed to delete user',
-        statusCode: 500
-      };
+      return { success: false, error: 'database_error' };
     }
   }
 }

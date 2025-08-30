@@ -46,8 +46,7 @@ describe('UserService', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error).toBe('Failed to fetch users');
-          expect(result.statusCode).toBe(500);
+          expect(result.error).toBe('database_error');
         }
       });
     });
@@ -81,8 +80,7 @@ describe('UserService', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error).toBe('User not found');
-          expect(result.statusCode).toBe(404);
+          expect(result.error).toBe('not_found');
         }
       });
     });
@@ -99,8 +97,7 @@ describe('UserService', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error).toBe('Failed to fetch user');
-          expect(result.statusCode).toBe(500);
+          expect(result.error).toBe('database_error');
         }
       });
     });
@@ -152,8 +149,7 @@ describe('UserService', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error).toBe('Email already exists');
-          expect(result.statusCode).toBe(400);
+          expect(result.error).toBe('email_exists');
         }
       });
     });
@@ -171,8 +167,7 @@ describe('UserService', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error).toBe('Failed to create user');
-          expect(result.statusCode).toBe(500);
+          expect(result.error).toBe('database_error');
         }
       });
     });
@@ -232,8 +227,7 @@ describe('UserService', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error).toBe('User not found');
-          expect(result.statusCode).toBe(404);
+          expect(result.error).toBe('not_found');
         }
       });
     });
@@ -255,8 +249,7 @@ describe('UserService', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error).toBe('Email already exists');
-          expect(result.statusCode).toBe(400);
+          expect(result.error).toBe('email_exists');
         }
       });
     });
@@ -276,8 +269,7 @@ describe('UserService', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error).toBe('Failed to update user');
-          expect(result.statusCode).toBe(500);
+          expect(result.error).toBe('database_error');
         }
       });
     });
@@ -314,8 +306,7 @@ describe('UserService', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error).toBe('User not found');
-          expect(result.statusCode).toBe(404);
+          expect(result.error).toBe('not_found');
         }
       });
     });
@@ -335,8 +326,7 @@ describe('UserService', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error).toBe('Failed to delete user');
-          expect(result.statusCode).toBe(500);
+          expect(result.error).toBe('database_error');
         }
       });
     });
